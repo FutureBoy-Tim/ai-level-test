@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07070d">
+<title>나의 AI 활용도 진단하기 · 2026 최신판</title>
+<meta name="description" content="프롬프트 한 번 복사로 AI에게 내 활용도를 진단받고, 1분 자가진단으로 내 레벨과 5대 전투력 스탯을 확인하세요. 2026 최신판.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%237c5cff'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='sans-serif'%3EAI%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#07070d;
+    --bg2:#0d0d18;
+    --card:rgba(20,20,34,.82);
+    --card-solid:#141422;
+    --line:rgba(255,255,255,.09);
+    --line-strong:rgba(255,255,255,.16);
+    --txt:#f2f2f7;
+    --txt-dim:#a3a3b8;
+    --txt-mute:#6f6f86;
+    --violet:#7c5cff;
+    --cyan:#00e5c7;
+    --pink:#ff4d7d;
+    --amber:#ffc247;
+    --grad:linear-gradient(135deg,#7c5cff 0%,#22b8ff 55%,#00e5c7 100%);
+    --r-lg:22px;
+    --r-md:16px;
+    --r-sm:11px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 520px at 12% -8%,rgba(124,92,255,.30),transparent 62%),
+      radial-gradient(760px 460px at 92% 4%,rgba(0,229,199,.16),transparent 60%),
+      radial-gradient(720px 520px at 50% 108%,rgba(34,184,255,.12),transparent 62%),
+      var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic","Noto Sans KR","Noto Sans CJK KR",Roboto,"Helvetica Neue",Arial,sans-serif;
+    line-height:1.62;
+    letter-spacing:-.01em;
+    min-height:100vh;
+    padding:0 0 56px;
+    overflow-x:hidden;
+  }
+  .wrap{width:100%;max-width:560px;margin:0 auto;padding:0 18px}
+  /* ---------- header ---------- */
+  header{padding:34px 0 22px}
+  .badge{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12px;font-weight:700;letter-spacing:.02em;
+    padding:6px 12px;border-radius:999px;
+    color:#d9d2ff;background:rgba(124,92,255,.16);
+    border:1px solid rgba(124,92,255,.42);
+  }
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  h1{
+    font-size:clamp(27px,7.6vw,34px);line-height:1.24;letter-spacing:-.035em;
+    margin:16px 0 10px;font-weight:800;
+  }
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{margin:0;color:var(--txt-dim);font-size:14.5px}
+  .lead b{color:#fff;font-weight:600}
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--r-lg);
+    backdrop-filter:blur(9px);
+    -webkit-backdrop-filter:blur(9px);
+  }
+  section{margin-top:34px}
+  .sec-head{display:flex;align-items:baseline;gap:9px;margin-bottom:13px}
+  .sec-num{
+    flex:0 0 auto;font-size:11px;font-weight:800;letter-spacing:.08em;
+    color:#0a0a12;background:var(--cyan);padding:3px 8px;border-radius:7px;
+  }
+  .sec-head h2{font-size:19px;margin:0;letter-spacing:-.02em;font-weight:750}
+  .sec-sub{margin:-4px 0 14px;font-size:13.5px;color:var(--txt-mute)}
+  /* ---------- keyword strip ---------- */
+  .strip{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+  .chip{
+    font-size:12px;padding:5px 10px;border-radius:999px;color:#cfcbe8;
+    background:rgba(255,255,255,.045);border:1px solid var(--line);
+  }
+  /* ---------- tabs ---------- */
+  .tabs{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:5px;padding:5px;margin:0 -2px 14px;
+    background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:20px;
+  }
+  @media (max-width:479px){
+    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:6px}
+    .tab{text-align:center;padding:10px 6px}
+    .tab[data-i="0"]{grid-column:1 / -1}
+  }
+  .tab{
+    appearance:none;border:0;background:transparent;color:var(--txt-dim);
+    font:inherit;font-size:12.6px;font-weight:650;letter-spacing:-.02em;
+    padding:9px 11px;border-radius:999px;white-space:nowrap;cursor:pointer;flex:0 0 auto;
+    transition:color .18s,background .18s;
+  }
+  .tab[aria-selected="true"]{
+    color:#fff;background:var(--grad);box-shadow:0 4px 18px rgba(124,92,255,.34);
+  }
+  .prompt-card{padding:16px 16px 18px;position:relative;overflow:hidden}
+  .prompt-card::before{
+    content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,rgba(124,92,255,.75),rgba(0,229,199,.5),transparent);
+  }
+  .p-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+  .p-title{font-size:14px;font-weight:750;letter-spacing:-.015em}
+  .p-title span{color:var(--cyan);font-weight:600;font-size:12.5px;display:block;margin-top:2px}
+  .p-len{flex:0 0 auto;font-size:11px;color:var(--txt-mute);border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+  .prompt-box{
+    max-height:252px;overflow:auto;overscroll-behavior:contain;
+    background:#08080f;border:1px solid rgba(255,255,255,.075);border-radius:var(--r-md);
+    padding:14px 13px;position:relative;
+  }
+  .prompt-box::after{
+    content:"";position:sticky;display:block;bottom:-14px;height:34px;margin:0 -13px -14px;
+    background:linear-gradient(to bottom,rgba(8,8,15,0),#08080f);pointer-events:none;
+  }
+  .prompt-box pre{
+    margin:0;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;
+    font-family:inherit;
+    font-size:12.8px;line-height:1.78;color:#dcdce9;letter-spacing:-.005em;
+  }
+  .copy{
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    width:100%;margin-top:14px;min-height:56px;padding:16px 18px;
+    border:0;border-radius:16px;cursor:pointer;
+    font:inherit;font-size:16.5px;font-weight:800;letter-spacing:-.02em;color:#07070d;
+    background:var(--grad);background-size:180% 180%;
+    box-shadow:0 10px 30px rgba(124,92,255,.36),inset 0 1px 0 rgba(255,255,255,.42);
+    transition:transform .12s ease,filter .18s;
+  }
+  .copy:active{transform:scale(.985);filter:brightness(1.06)}
+  .copy svg{width:21px;height:21px;flex:0 0 auto}
+  .hint{margin:10px 2px 0;font-size:12px;color:var(--txt-mute);text-align:center}
+  .applinks{display:flex;gap:8px;margin-top:13px;flex-wrap:wrap}
+  .applink{
+    flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;
+    white-space:nowrap;
+    text-decoration:none;font-size:12px;font-weight:650;color:var(--txt-dim);
+    background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;
+    padding:10px 6px;transition:color .18s,border-color .18s;
+  }
+  .applink::after{content:"↗";font-size:10px;color:var(--txt-mute);margin-left:-2px}
+  .applink:hover{color:#fff;border-color:var(--line-strong)}
+  .applink i{font-style:normal;font-size:14px;line-height:1}
+  /* ---------- quiz ---------- */
+  .quiz{padding:18px 16px 20px}
+  .q-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--txt-mute);margin-bottom:9px}
+  .bar{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:18px}
+  .bar i{display:block;height:100%;width:0;border-radius:999px;background:var(--grad);transition:width .35s cubic-bezier(.3,.8,.3,1)}
+  .q-text{font-size:17px;font-weight:750;letter-spacing:-.025em;margin:0 0 15px;line-height:1.45}
+  .opts{display:flex;flex-direction:column;gap:9px}
+  .opt{
+    display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+    font:inherit;font-size:14.5px;color:#e6e6f0;line-height:1.45;
+    background:rgba(255,255,255,.035);border:1px solid var(--line);
+    border-radius:14px;padding:14px 14px;cursor:pointer;
+    transition:background .15s,border-color .15s,transform .1s;
+  }
+  .opt:hover{background:rgba(255,255,255,.07);border-color:var(--line-strong)}
+  .opt:active{transform:scale(.99)}
+  .opt .k{
+    flex:0 0 auto;width:24px;height:24px;border-radius:8px;display:grid;place-items:center;
+    font-size:12px;font-weight:800;color:#b8b2e0;background:rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.3);
+  }
+  .opt.sel{border-color:rgba(0,229,199,.6);background:rgba(0,229,199,.1)}
+  .opt.sel .k{color:#07070d;background:var(--cyan);border-color:var(--cyan)}
+  .q-nav{display:flex;justify-content:flex-start;margin-top:14px}
+  .ghost{
+    appearance:none;border:1px solid var(--line);background:transparent;color:var(--txt-dim);
+    font:inherit;font-size:13px;padding:9px 14px;border-radius:11px;cursor:pointer;
+    white-space:nowrap;flex:0 0 auto;
+  }
+  .ghost:hover{color:#fff;border-color:var(--line-strong)}
+  /* ---------- result ---------- */
+  #result{display:none;margin-top:18px}
+  #result.show{display:block;animation:rise .45s cubic-bezier(.2,.8,.3,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .res-card{padding:20px 17px}
+  .res-lv{display:flex;align-items:center;gap:12px}
+  .lv-ring{
+    flex:0 0 auto;width:62px;height:62px;border-radius:50%;display:grid;place-items:center;
+    background:var(--grad);color:#07070d;font-weight:900;font-size:15px;letter-spacing:-.03em;
+    box-shadow:0 0 0 1px rgba(255,255,255,.18),0 8px 26px rgba(124,92,255,.45);
+  }
+  .lv-name{font-size:19px;font-weight:800;letter-spacing:-.03em;line-height:1.25}
+  .lv-nick{font-size:13.5px;color:var(--cyan);font-weight:650;margin-top:3px}
+  .lv-score{font-size:12px;color:var(--txt-mute);margin-top:2px}
+  .quote{
+    margin:16px 0 0;padding:14px 15px 14px 16px;border-radius:14px;
+    background:rgba(255,77,125,.09);border:1px solid rgba(255,77,125,.28);
+    border-left:3px solid var(--pink);
+  }
+  .quote .lb{font-size:11px;font-weight:800;letter-spacing:.06em;color:#ff8ea8;display:block;margin-bottom:5px}
+  .quote p{margin:0;font-size:14.5px;font-weight:650;line-height:1.6;color:#ffe7ec}
+  .radar-wrap{display:flex;gap:14px;align-items:center;margin-top:18px}
+  .radar{flex:0 0 auto;width:162px;height:162px}
+  .legend{flex:1 1 auto;display:flex;flex-direction:column;gap:7px;min-width:0}
+  .lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--txt-dim)}
+  .lg b{margin-left:auto;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
+  .lg .sw{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+  .stat-bars{margin-top:18px;display:flex;flex-direction:column;gap:11px}
+  .sb .top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--txt-dim);margin-bottom:5px}
+  .sb .top b{color:#fff;font-variant-numeric:tabular-nums}
+  .sb .track{height:7px;border-radius:999px;background:rgba(255,255,255,.075);overflow:hidden}
+  .sb .track i{display:block;height:100%;border-radius:999px;background:var(--grad);width:0;transition:width .7s cubic-bezier(.2,.8,.3,1)}
+  .block{margin-top:16px;padding-top:15px;border-top:1px solid var(--line)}
+  .block h4{margin:0 0 7px;font-size:12px;letter-spacing:.06em;color:var(--cyan);font-weight:800}
+  .block p{margin:0;font-size:14px;color:#e8e8f2;line-height:1.66}
+  .block ul{margin:0;padding-left:17px;font-size:13.8px;color:#dedee9;line-height:1.7}
+  .block li+li{margin-top:5px}
+  .res-actions{display:flex;gap:8px;margin-top:17px}
+  .res-actions .copy{min-height:48px;font-size:14.5px;margin-top:0;flex:1 1 auto}
+  .res-actions .copy svg{width:18px;height:18px}
+  /* ---------- level table ---------- */
+  .lvt{padding:6px 2px}
+  .lvrow{display:flex;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}
+  .lvrow:last-child{border-bottom:0}
+  .lvtag{
+    flex:0 0 auto;width:46px;height:23px;border-radius:7px;display:grid;place-items:center;
+    font-size:11.5px;font-weight:800;color:#07070d;background:#3a3a52;
+  }
+  .lvrow:nth-child(1) .lvtag{background:#5a5a78}
+  .lvrow:nth-child(2) .lvtag{background:#7c6bd8;color:#fff}
+  .lvrow:nth-child(3) .lvtag{background:linear-gradient(135deg,#7c5cff,#22b8ff);color:#fff}
+  .lvrow:nth-child(4) .lvtag{background:linear-gradient(135deg,#22b8ff,#00e5c7);color:#07070d}
+  .lvrow:nth-child(5) .lvtag{background:linear-gradient(135deg,#00e5c7,#b6ff5c);color:#07070d}
+  .lvrow .t{min-width:0}
+  .lvrow .t b{display:block;font-size:14px;letter-spacing:-.015em}
+  .lvrow .t span{display:block;font-size:12.8px;color:var(--txt-mute);line-height:1.55;margin-top:2px}
+  /* ---------- footer ---------- */
+  footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--line);color:var(--txt-mute);font-size:12px;line-height:1.8}
+  footer b{color:var(--txt-dim);font-weight:650}
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);
+    max-width:calc(100% - 32px);width:max-content;
+    background:#00e5c7;color:#052a24;font-size:14px;font-weight:750;letter-spacing:-.01em;
+    padding:13px 18px;border-radius:14px;
+    box-shadow:0 14px 40px rgba(0,229,199,.34),0 2px 8px rgba(0,0,0,.4);
+    opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:50;
+    text-align:center;
+  }
+  #toast.on{opacity:1;transform:translate(-50%,0)}
+  #toast.warn{background:#ffc247;color:#2a1f00;box-shadow:0 14px 40px rgba(255,194,71,.3)}
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001s!important;transition-duration:.001s!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="badge"><span class="dot"></span>2026 최신판 · AI 레벨 진단</span>
+    <h1>나의 AI 활용도<br><span class="g">진단하기</span></h1>
+    <p class="lead">AI 앱에 <b>프롬프트 한 번 붙여넣으면</b> 내 레벨과 5대 전투력 스탯을 진단받습니다.<br>앱 열기 번거로우시면 아래 <b>1분 자가진단</b>으로 바로 확인하세요.</p>
+    <div class="strip">
+      <span class="chip">Lv1 검색기 → Lv5 AI 팀장</span>
+      <span class="chip">5대 전투력 100점</span>
+      <span class="chip">구독료 본전 팩폭</span>
+    </div>
+  </header>
+
+  <!-- ============ 1. 프롬프트 ============ -->
+  <section id="prompts">
+    <div class="sec-head"><span class="sec-num">01</span><h2>프롬프트 복사하기</h2></div>
+    <p class="sec-sub">쓰시는 AI에 맞는 탭을 고르고, 버튼 한 번 누른 뒤 AI 앱에 붙여넣으세요.</p>
+
+    <div class="tabs" role="tablist" aria-label="AI별 프롬프트">
+      <button class="tab" role="tab" id="tab-common" aria-selected="true" aria-controls="panel" data-i="0">공통 (추천)</button>
+      <button class="tab" role="tab" id="tab-gpt" aria-selected="false" aria-controls="panel" data-i="1">ChatGPT용</button>
+      <button class="tab" role="tab" id="tab-claude" aria-selected="false" aria-controls="panel" data-i="2">Claude용</button>
+      <button class="tab" role="tab" id="tab-gemini" aria-selected="false" aria-controls="panel" data-i="3">Gemini용</button>
+      <button class="tab" role="tab" id="tab-cross" aria-selected="false" aria-controls="panel" data-i="4">AI 청문회용</button>
+    </div>
+
+    <div class="card prompt-card" id="panel" role="tabpanel" aria-labelledby="tab-common">
+      <div class="p-meta">
+        <div class="p-title" id="pTitle">공통 (추천)<span id="pSub">어떤 AI에 넣어도 됩니다. 처음이시면 이걸 쓰세요.</span></div>
+        <span class="p-len" id="pLen">0자</span>
+      </div>
+      <div class="prompt-box" id="pBox"><pre id="pText"></pre></div>
+      <button class="copy" id="copyBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>
+        프롬프트 복사하기
+      </button>
+      <p class="hint" id="pHint">복사 후 AI 앱 대화창에 붙여넣고, AI가 묻는 5문항에 답하면 진단이 끝납니다.</p>
+
+      <div class="applinks">
+        <a class="applink" href="https://chatgpt.com/" target="_blank" rel="noopener"><i>💬</i>ChatGPT</a>
+        <a class="applink" href="https://claude.ai/new" target="_blank" rel="noopener"><i>🧠</i>Claude</a>
+        <a class="applink" href="https://gemini.google.com/app" target="_blank" rel="noopener"><i>✨</i>Gemini</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. 자가진단 ============ -->
+  <section id="quizSec">
+    <div class="sec-head"><span class="sec-num">02</span><h2>1분 초간단 자가진단</h2></div>
+    <p class="sec-sub">지금 AI 앱 열기 번거로우신 분은 여기서 5문항 1분 테스트!</p>
+
+    <div class="card quiz">
+      <div class="q-top"><span id="qCount">문항 1 / 5</span><span id="qSec">질문력</span></div>
+      <div class="bar"><i id="qBar"></i></div>
+      <p class="q-text" id="qText">불러오는 중…</p>
+      <div class="opts" id="qOpts"></div>
+      <div class="q-nav" id="qNav" style="visibility:hidden">
+        <button class="ghost" id="qBack" type="button">← 이전 문항</button>
+      </div>
+    </div>
+
+    <div id="result" aria-live="polite">
+      <div class="card res-card">
+        <div class="res-lv">
+          <div class="lv-ring" id="rLv">Lv3</div>
+          <div>
+            <div class="lv-name" id="rName">동료</div>
+            <div class="lv-nick" id="rNick">자료 부자형</div>
+            <div class="lv-score" id="rScore">종합 60 / 100</div>
+          </div>
+        </div>
+
+        <div class="quote">
+          <span class="lb">구독료 본전 팩폭</span>
+          <p id="rRoast"></p>
+        </div>
+
+        <div class="radar-wrap">
+          <svg class="radar" id="rRadar" viewBox="0 0 200 200" aria-hidden="true"></svg>
+          <div class="legend" id="rLegend"></div>
+        </div>
+
+        <div class="stat-bars" id="rBars"></div>
+
+        <div class="block">
+          <h4>당장 바꿀 습관 1가지</h4>
+          <p id="rHabit"></p>
+        </div>
+        <div class="block">
+          <h4>다음 단계 팁</h4>
+          <ul id="rNext"></ul>
+        </div>
+
+        <div class="res-actions">
+          <button class="copy" id="copyRes" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/></svg>
+            결과 복사해 공유
+          </button>
+          <button class="ghost" id="retry" type="button">다시 하기</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. 레벨 기준 ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>레벨 기준 한눈에</h2></div>
+    <p class="sec-sub">AI가 매기는 기준입니다. 나는 어디쯤인지 미리 가늠해 보세요.</p>
+    <div class="card lvt">
+      <div class="lvrow"><span class="lvtag">Lv1</span><div class="t"><b>검색기</b><span>한 줄 질문, 답은 그대로 사용. AI는 똑똑한 검색창.</span></div></div>
+      <div class="lvrow"><span class="lvtag">Lv2</span><div class="t"><b>비서</b><span>조건을 붙여 시키지만, 매번 처음부터 다시 설명한다.</span></div></div>
+      <div class="lvrow"><span class="lvtag">Lv3</span><div class="t"><b>동료</b><span>내 자료·상황을 먹이고, 결과물을 함께 다듬는다.</span></div></div>
+      <div class="lvrow"><span class="lvtag">Lv4</span><div class="t"><b>오케스트레이터</b><span>여러 AI·도구를 연결해 일을 넘기고 결과를 검수한다.</span></div></div>
+      <div class="lvrow"><span class="lvtag">Lv5</span><div class="t"><b>AI 팀장</b><span>AI가 조사·실행·검증·자동화까지. 사람은 판단만 한다.</span></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <b>나의 AI 활용도 진단하기 · 2026 최신판</b><br>
+    수업용 자료 · 미래소년 AI 마케팅 연구소<br>
+    QR을 찍어 접속하셨다면 이 페이지를 즐겨찾기에 저장해 두세요.
+  </footer>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- 프롬프트 데이터 ---------------- */
+  var CORE = [
+    "당신은 'AI 활용도 진단관'입니다. 저는 한국에서 사업을 하는 사람이고, 제가 AI를 실제로 얼마나 잘 쓰는지 냉정하게 진단받으려 합니다. 칭찬은 필요 없고 근거 있는 팩트만 말해 주세요.",
+    "",
+    "[2026 최신판 진단 기준]",
+    "",
+    "1) 레벨 5단계",
+    "- Lv1 검색기: AI를 검색창처럼 쓴다. 질문은 한 줄, 답은 그대로 쓴다.",
+    "- Lv2 비서: 조건을 붙여 시키지만, 매번 처음부터 다시 설명한다.",
+    "- Lv3 동료: 내 자료와 상황을 먹이고, 결과물을 함께 다듬는다.",
+    "- Lv4 오케스트레이터: 여러 AI와 도구를 연결해 일을 넘기고 결과를 검수한다.",
+    "- Lv5 AI 팀장: AI가 조사·실행·검증·자동화까지 하게 설계하고, 사람은 판단만 한다.",
+    "",
+    "2) 5대 전투력 스탯 (각 100점, 총 500점)",
+    "- 질문력: 지시를 구조화하는 힘 (역할·맥락·형식·제약을 지정하는가)",
+    "- 맥락력: 내 자료를 먹이는 힘 (문서·사진·데이터를 AI가 읽게 하는가)",
+    "- 검증력: 결과를 의심하는 힘 (사실·숫자·출처를 대조하고 교차 검증하는가)",
+    "- 연결력: 도구를 잇는 힘 (메일·캘린더·드라이브·업무툴과 연결하는가)",
+    "- 자동화력: 반복을 시스템으로 바꾸는 힘 (저장·예약·자동 실행으로 굴리는가)",
+    "",
+    "[진행 방식]",
+    "1. 먼저 저에게 5문항을 인터뷰합니다. 한 번에 한 문항씩 묻고, 제가 답하면 다음 문항으로 넘어가세요. 애매하면 선택지를 3~4개로 좁혀 물어보세요.",
+    "2. 5문항을 넘기지 마세요. 저에 대한 기록이 부족하면 이 인터뷰만으로 진단하세요.",
+    "3. 다섯 문항이 끝나면 아래 형식으로 한 번에 정리해 주세요.",
+    "",
+    "[출력 형식]",
+    "■ 내 레벨: Lv? (이름) — 한 줄 근거",
+    "■ 5대 전투력: 스탯마다 점수/100과 한 줄 코멘트. 가장 강한 스탯과 가장 약한 스탯을 표시",
+    "■ AI 유형 별명: 제 습관을 한 단어에 가깝게 붙여 주세요 (예: 검색창 인질, 자료 부자, 지휘자, 팩트 경찰)",
+    "■ 구독료 본전 팩폭: 딱 한 줄. 월 구독료를 본전 뽑고 있는지 아프게 말해 주세요",
+    "■ 당장 바꿀 습관 1가지: 오늘 10분 안에 할 수 있는 구체적인 행동",
+    "■ 다음 단계 팁: 다음 레벨로 가는 조건 3가지, 각각 실행 순서까지"
+  ].join("\n");
+
+  var TAIL = "\n\n[질문] 지금 시작해 주세요. 첫 문항부터 물어보세요.";
+
+  var PLATFORM = {
+    1: [
+      "[이 대화에서 추가로 지켜 주세요]",
+      "- 중간 정리는 표로 보여 주세요.",
+      "- 2026년 최신 활용법이 필요하면 웹 검색을 켜서 확인한 내용만 반영하고, 출처를 함께 적어 주세요.",
+      "- 진단이 끝나면 제가 '내 지침'에 저장할 수 있도록 마지막에 [나의 AI 작업 지침] 5줄을 만들어 주세요.",
+      "- 다음 대화에서도 같은 기준으로 이어서 볼 수 있게, 제 답변을 요약해 한 단락으로 남겨 주세요."
+    ].join("\n"),
+    2: [
+      "[이 대화에서 추가로 지켜 주세요]",
+      "- 결과는 아티팩트로 한 장짜리 진단 카드로 만들어 주세요. 제목, 레벨, 5대 스탯 막대, 팩폭 한 줄, 다음 단계가 한 화면에 보여야 합니다.",
+      "- 점수마다 제가 실제로 한 말을 짧게 인용해 근거를 붙여 주세요.",
+      "- 마지막에 프로젝트 지침(CLAUDE.md)에 붙여 넣을 [나의 작업 지침] 5줄을 제안해 주세요.",
+      "- 근거가 약한 항목은 점수를 비우지 말고 '판단 보류'로 표시하고, 무엇을 알려주면 채울 수 있는지 한 줄로 적어 주세요."
+    ].join("\n"),
+    3: [
+      "[이 대화에서 추가로 지켜 주세요]",
+      "- 제가 이어서 업무 메모나 이전 대화를 붙여 넣으면 함께 읽고 반영해 주세요. 붙여 넣은 자료에 없는 내용은 추측하지 마세요.",
+      "- 결과는 Google Docs에 그대로 붙여 넣기 좋은 표 형식으로 정리해 주세요.",
+      "- 표 아래에 '이번 주에 할 일 3개'를 체크박스 목록으로 붙여 주세요.",
+      "- 마지막에 제가 다음에 물어보면 좋을 질문 3개를 제안해 주세요."
+    ].join("\n")
+  };
+
+  var CROSS = [
+    "당신은 'AI 청문회 검증관'입니다. 다른 AI가 제 AI 활용도를 진단한 결과를 아래에 붙여 넣겠습니다. 당신의 일은 그 진단을 그대로 인정하는 것이 아니라, 증인을 심문하듯 반박하고 보완하는 것입니다.",
+    "",
+    "[검증 규칙]",
+    "1. 진단의 각 항목(레벨·5대 스탯·별명·팩폭·습관·다음 단계)에 대해 ① 동의 ② 근거 부족 ③ 반박 중 하나로 판정하고 이유를 한 줄로 쓰세요.",
+    "2. 점수가 후하게 매겨졌다고 보면 근거와 함께 감점 의견을, 과소평가라고 보면 올릴 근거를 제시하세요.",
+    "3. 진단에서 빠진 스탯이나 빠진 질문이 있으면 지적하세요.",
+    "4. 제가 답하지 않은 것을 답한 것으로 가정했다면 그 부분을 짚으세요.",
+    "5. 마지막에 당신이 다시 매긴 '최종 레벨'과 '5대 스탯 점수'를 제시하세요.",
+    "6. 판정은 냉정하게, 근거는 짧게. 칭찬으로 시작하지 마세요.",
+    "",
+    "[5대 전투력 스탯 기준] 질문력(지시 구조화) · 맥락력(내 자료 먹이기) · 검증력(결과 의심과 대조) · 연결력(도구 잇기) · 자동화력(반복을 시스템으로) — 각 100점.",
+    "",
+    "[내 진단 결과]",
+    "(여기에 다른 AI가 준 진단 결과를 그대로 붙여 넣으세요)",
+    "",
+    "[질문] 위 규칙대로 검증을 시작해 주세요. 정보가 부족하면 저에게 최대 3개까지만 물어보세요."
+  ].join("\n");
+
+  var PROMPTS = [
+    {
+      title:"공통 (추천)",
+      sub:"어떤 AI에 넣어도 됩니다. 처음이시면 이걸 쓰세요.",
+      hint:"복사 후 AI 앱 대화창에 붙여넣고, AI가 묻는 5문항에 답하면 진단이 끝납니다.",
+      text: CORE + "\n\n[마무리] 진단이 끝나면 제가 오늘 바로 할 수 있는 행동 하나만 골라 굵게 표시해 주세요." + TAIL
+    },
+    {
+      title:"ChatGPT용",
+      sub:"웹 검색·메모리·표 정리에 강점을 붙였습니다.",
+      hint:"복사 → ChatGPT 새 대화에 붙여넣기. 웹 검색이 켜져 있으면 더 정확합니다.",
+      text: CORE + "\n\n" + PLATFORM[1] + TAIL
+    },
+    {
+      title:"Claude용",
+      sub:"한 장짜리 진단 카드(아티팩트)로 받아 보세요.",
+      hint:"복사 → Claude 새 대화에 붙여넣기. 결과가 카드로 나오면 그대로 캡처해 공유하세요.",
+      text: CORE + "\n\n" + PLATFORM[2] + TAIL
+    },
+    {
+      title:"Gemini용",
+      sub:"내 업무 메모를 함께 읽혀 진단 정확도를 올립니다.",
+      hint:"복사 → Gemini에 붙여넣고, 이어서 업무 메모나 이전 대화를 붙여 넣으세요.",
+      text: CORE + "\n\n" + PLATFORM[3] + TAIL
+    },
+    {
+      title:"AI 청문회용",
+      sub:"다른 AI의 진단을 교차 검증합니다. 두 번째 AI에 붙여넣으세요.",
+      hint:"먼저 위 탭으로 진단을 받은 뒤, 그 결과를 복사해 이 프롬프트 아래에 붙여넣으세요.",
+      text: CROSS
+    }
+  ];
+
+  /* ---------------- 탭 ---------------- */
+  var pText = document.getElementById('pText'),
+      pTitle = document.getElementById('pTitle'),
+      pSub   = document.getElementById('pSub'),
+      pLen   = document.getElementById('pLen'),
+      pHint  = document.getElementById('pHint'),
+      panel  = document.getElementById('panel'),
+      tabs   = Array.prototype.slice.call(document.querySelectorAll('.tab')),
+      current = 0;
+
+  function renderTab(i){
+    current = i;
+    var p = PROMPTS[i];
+    pText.textContent = p.text;
+    pTitle.childNodes[0].nodeValue = p.title;
+    pSub.textContent = p.sub;
+    pLen.textContent = p.text.length.toLocaleString('ko-KR') + '자';
+    pHint.textContent = p.hint;
+    panel.setAttribute('aria-labelledby', 'tab-' + ['common','gpt','claude','gemini','cross'][i]);
+    tabs.forEach(function(t, k){ t.setAttribute('aria-selected', k === i ? 'true':'false'); });
+    var box = document.getElementById('pBox'); if (box) box.scrollTop = 0;
+    try{
+      tabs[i].scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'});
+    }catch(e){}
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ renderTab(parseInt(t.dataset.i,10)); });
+  });
+  renderTab(0);
+
+  /* ---------------- 토스트 ---------------- */
+  var toastEl = document.getElementById('toast'), toastTimer = null;
+  function toast(msg, warn){
+    toastEl.textContent = msg;
+    toastEl.className = 'on' + (warn ? ' warn' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.className = ''; }, 2900);
+  }
+
+  function copyText(text, okMsg){
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly','');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '0';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = false;
+      try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+      document.body.removeChild(ta);
+      if (ok){ toast(okMsg); }
+      else { toast('복사가 막혔어요. 글자를 길게 눌러 직접 복사해 주세요.', true); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ toast(okMsg); }, fallback);
+    } else { fallback(); }
+  }
+
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    copyText(PROMPTS[current].text, '복사 완료! 이제 쓰시는 AI 앱에 붙여넣으세요');
+  });
+
+  /* ---------------- 자가진단 ---------------- */
+  var STATS = [
+    {key:'질문력',   color:'#7c5cff'},
+    {key:'맥락력',   color:'#22b8ff'},
+    {key:'검증력',   color:'#ff4d7d'},
+    {key:'연결력',   color:'#ffc247'},
+    {key:'자동화력', color:'#00e5c7'}
+  ];
+
+  var QUESTIONS = [
+    {
+      sec:'질문력',
+      q:'AI에게 일을 시킬 때 나는?',
+      opts:[
+        '검색창처럼 한 줄로 물어본다',
+        '조건과 원하는 형식을 붙여서 묻는다',
+        '내 상황 설명과 참고 자료를 함께 넘긴다',
+        '저장해 둔 내 지침(프롬프트)을 불러 쓴다',
+        '내 지침을 다듬어 템플릿으로 계속 굴린다'
+      ]
+    },
+    {
+      sec:'검증력',
+      q:'AI가 준 답을 받으면 나는?',
+      opts:[
+        '그대로 쓴다. 틀린 적이 거의 없다',
+        '이상한 부분만 다시 물어본다',
+        '숫자와 사실을 원문·공식 자료와 대조한다',
+        '다른 AI에게 같은 것을 물어 교차 검증한다',
+        '검증 규칙을 미리 정해 두고 걸러 쓴다'
+      ]
+    },
+    {
+      sec:'맥락력',
+      q:'내 사업 자료(문서·사진·엑셀)는?',
+      opts:[
+        'AI에 올려 본 적이 없다',
+        '한두 번 올려 본 정도다',
+        '필요할 때 올려서 그 자료 기준으로 답하게 한다',
+        'AI가 읽기 좋게 자료를 정리해 두었다',
+        '자료가 연결돼 있어 묻기만 하면 꺼내 쓴다'
+      ]
+    },
+    {
+      sec:'연결력',
+      q:'도구와의 연결은 어디까지 해 봤나?',
+      opts:[
+        'AI 앱 하나만 쓴다',
+        '용도별로 여러 AI를 쓴다',
+        '메일·캘린더·드라이브와 연동해 쓴다',
+        '여러 도구를 하나의 흐름으로 엮는다',
+        '다른 사람도 쓸 수 있게 시스템으로 만들어 두었다'
+      ]
+    },
+    {
+      sec:'자동화력',
+      q:'반복되는 업무는 어떻게 처리하나?',
+      opts:[
+        '매번 손으로 한다',
+        '매번 AI에게 시킨다',
+        '문장과 절차를 저장해 재사용한다',
+        '정해진 시간에 자동으로 돌게 해 두었다',
+        '자동화가 실패하면 알려 주고 다시 돌게 해 두었다'
+      ]
+    }
+  ];
+
+  var LEVELS = [
+    {
+      lv:'Lv1', name:'검색기',
+      nick:'검색창 인질형',
+      roast:'월 구독료 내고 똑똑한 검색창 하나 더 쓰고 있습니다. 그 돈이면 커피 40잔입니다.',
+      habit:'다음 질문 하나만 이렇게 바꿔 보세요. "결론부터 3줄, 그다음 근거 3개, 마지막에 내가 할 일 1개" — 이 한 줄이 레벨을 바꿉니다.',
+      next:['질문에 역할을 붙이기 — "당신은 20년차 마케팅 기획자입니다"로 시작', '원하는 출력 형식을 미리 말하기 — 표, 3줄 요약, 체크리스트', '같은 질문을 두 번 하지 않기 — 잘 된 답은 메모에 저장']
+    },
+    {
+      lv:'Lv2', name:'비서',
+      nick:'만능 심부름꾼형',
+      roast:'잘 쓰는 것 같지만, 매번 같은 설명을 다시 타이핑하며 그 시간을 그냥 버리고 있습니다.',
+      habit:'오늘 쓴 질문 중 제일 잘 먹힌 하나를 골라 AI의 "내 지침·커스텀 지시·프로젝트" 칸에 붙여 넣으세요. 다음 질문부터 설명이 사라집니다.',
+      next:['내 사업·제품 정보를 한 장으로 정리해 항상 첨부하기', '답을 받으면 "근거와 출처를 함께"를 붙이기', '한 대화에서 한 주제만 다루기 — 섞으면 품질이 떨어집니다']
+    },
+    {
+      lv:'Lv3', name:'동료',
+      nick:'자료 부자형',
+      roast:'자료는 잘 먹이는데, 한 번 쓴 지침을 다시 안 씁니다. 본전의 70%까지 왔습니다. 남은 30%는 저장과 검증입니다.',
+      habit:'내 문서 하나를 올리고 "이 자료에 없는 내용은 추측하지 말고 모른다고 답해"를 붙이세요. 환각이 줄고 신뢰가 생깁니다.',
+      next:['반복하는 업무 하나를 골라 절차서(프롬프트 3단계)로 만들기', '결과 검증을 다른 AI에게 맡기는 습관 들이기', '내 자료를 AI가 읽기 좋은 형태로 정리해 두기']
+    },
+    {
+      lv:'Lv4', name:'오케스트레이터',
+      nick:'지휘자형',
+      roast:'본전은 뽑고 있습니다. 다만 아직 손이 일을 놓지 못합니다. 옮기는 일을 AI에게 넘기면 시간이 한 번 더 벌립니다.',
+      habit:'매주 반복되는 일 하나를 골라 "정해진 시간에 자동으로 돌게" 만들어 보세요. 한 번만 세팅하면 매주 돌아갑니다.',
+      next:['자동화가 실패했을 때 알려 주는 알림 붙이기', 'AI에게 검증자 역할을 하나 더 붙여 스스로 교차 점검', '내가 판단만 하면 되는 업무 목록 만들기']
+    },
+    {
+      lv:'Lv5', name:'AI 팀장',
+      nick:'판단만 하는 사장형',
+      roast:'이제 구독료가 아니라 팀원 월급입니다. 지금 이대로면 같은 비용으로 10배는 더 뽑아야 본전입니다.',
+      habit:'AI가 낸 결론을 한 번 더 의심하는 절차를 만드세요. "반대 논거 3개와 그 근거"를 항상 함께 받으면 판단 사고가 줄어듭니다.',
+      next:['자동화 결과를 사람이 검수하는 마지막 관문 설계', '내 지침을 문서화해 다른 사람도 같은 품질로 쓰게 하기', 'AI가 못 하는 판단(관계·타이밍·책임)에 시간을 몰아주기']
+    }
+  ];
+
+  var answers = new Array(5).fill(-1);
+  var step = 0;
+  var qText = document.getElementById('qText'),
+      qOpts = document.getElementById('qOpts'),
+      qCount = document.getElementById('qCount'),
+      qSec = document.getElementById('qSec'),
+      qBar = document.getElementById('qBar'),
+      qNav = document.getElementById('qNav'),
+      qBack = document.getElementById('qBack'),
+      resultEl = document.getElementById('result');
+
+  function renderQuestion(){
+    var q = QUESTIONS[step];
+    qCount.textContent = '문항 ' + (step+1) + ' / 5';
+    qSec.textContent = q.sec;
+    qBar.style.width = ((step) / 5 * 100) + '%';
+    qText.textContent = q.q;
+    qOpts.innerHTML = '';
+    q.opts.forEach(function(label, i){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt' + (answers[step] === i ? ' sel' : '');
+      b.innerHTML = '<span class="k">' + (i+1) + '</span><span>' + label + '</span>';
+      b.addEventListener('click', function(){ choose(i); });
+      qOpts.appendChild(b);
+    });
+    qNav.style.visibility = step === 0 ? 'hidden' : 'visible';
+  }
+
+  function choose(i){
+    answers[step] = i;
+    var btns = qOpts.querySelectorAll('.opt');
+    for (var k = 0; k < btns.length; k++){ btns[k].classList.toggle('sel', k === i); }
+    setTimeout(function(){
+      if (step < 4){ step++; renderQuestion(); }
+      else { finish(); }
+    }, 170);
+  }
+
+  qBack.addEventListener('click', function(){
+    if (step > 0){ step--; renderQuestion(); }
+  });
+
+  document.getElementById('retry').addEventListener('click', function(){
+    answers = new Array(5).fill(-1);
+    step = 0;
+    resultEl.classList.remove('show');
+    renderQuestion();
+    document.getElementById('quizSec').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  var lastResultText = '';
+
+  function finish(){
+    qBar.style.width = '100%';
+    var stats = answers.map(function(a){ return a * 25; });
+    var total = Math.round(stats.reduce(function(s,v){ return s+v; }, 0) / 5);
+    var li = total < 20 ? 0 : total < 40 ? 1 : total < 60 ? 2 : total < 80 ? 3 : 4;
+    var L = LEVELS[li];
+
+    document.getElementById('rLv').textContent = L.lv;
+    document.getElementById('rName').textContent = L.name;
+    document.getElementById('rNick').textContent = L.nick;
+    document.getElementById('rScore').textContent = '종합 ' + total + ' / 100 · 5문항 자가진단';
+    document.getElementById('rRoast').textContent = L.roast;
+    document.getElementById('rHabit').textContent = L.habit;
+
+    var ul = document.getElementById('rNext');
+    ul.innerHTML = '';
+    L.next.forEach(function(t){
+      var li2 = document.createElement('li');
+      li2.textContent = t;
+      ul.appendChild(li2);
+    });
+
+    // 레전드
+    var legend = document.getElementById('rLegend');
+    legend.innerHTML = '';
+    stats.forEach(function(v, i){
+      var row = document.createElement('div');
+      row.className = 'lg';
+      row.innerHTML = '<span class="sw" style="background:' + STATS[i].color + '"></span>' + STATS[i].key + '<b>' + v + '</b>';
+      legend.appendChild(row);
+    });
+
+    // 막대
+    var bars = document.getElementById('rBars');
+    bars.innerHTML = '';
+    stats.forEach(function(v, i){
+      var d = document.createElement('div');
+      d.className = 'sb';
+      d.innerHTML = '<div class="top"><span>' + STATS[i].key + '</span><b>' + v + '점</b></div><div class="track"><i></i></div>';
+      bars.appendChild(d);
+      setTimeout(function(){ d.querySelector('i').style.width = Math.max(v, 3) + '%'; }, 60 + i * 70);
+    });
+
+    drawRadar(stats);
+
+    // 공유 텍스트
+    var weak = STATS[stats.indexOf(Math.min.apply(null, stats))].key;
+    var strong = STATS[stats.indexOf(Math.max.apply(null, stats))].key;
+    var spread = Math.max.apply(null, stats) === Math.min.apply(null, stats)
+      ? '전 항목 고르게 ' + stats[0]
+      : '강점 ' + strong + ' / 보완 ' + weak;
+    lastResultText = [
+      '[나의 AI 활용도 진단 · 2026 최신판]',
+      '레벨: ' + L.lv + ' ' + L.name + ' (종합 ' + total + '/100)',
+      '유형: ' + L.nick + ' · ' + spread,
+      '5대 전투력: ' + STATS.map(function(s, i){ return s.key + ' ' + stats[i]; }).join(' · '),
+      '팩폭: ' + L.roast,
+      '오늘 바꿀 습관: ' + L.habit,
+      '다음 단계: ' + L.next[0],
+      '진단하기 → https://futureboy-tim.github.io/ai-level-test/'
+    ].join('\n');
+
+    resultEl.classList.add('show');
+    var y = resultEl.getBoundingClientRect().top + window.pageYOffset - 14;
+    window.scrollTo({top:y, behavior:'smooth'});
+  }
+
+  function drawRadar(stats){
+    var svg = document.getElementById('rRadar');
+    var cx = 100, cy = 100, R = 74;
+    var n = 5, pts = [];
+    var NS = 'http://www.w3.org/2000/svg';
+    svg.innerHTML = '';
+    function point(i, r){
+      var ang = -Math.PI/2 + i * 2 * Math.PI / n;
+      return [cx + Math.cos(ang) * r, cy + Math.sin(ang) * r];
+    }
+    // 격자
+    [0.25, 0.5, 0.75, 1].forEach(function(f){
+      var poly = document.createElementNS(NS, 'polygon');
+      var p = [];
+      for (var i = 0; i < n; i++){ p.push(point(i, R*f).join(',')); }
+      poly.setAttribute('points', p.join(' '));
+      poly.setAttribute('fill', 'none');
+      poly.setAttribute('stroke', f === 1 ? 'rgba(255,255,255,.22)' : 'rgba(255,255,255,.09)');
+      poly.setAttribute('stroke-width', '1');
+      svg.appendChild(poly);
+    });
+    // 축
+    for (var i = 0; i < n; i++){
+      var pp = point(i, R);
+      var line = document.createElementNS(NS, 'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', pp[0]); line.setAttribute('y2', pp[1]);
+      line.setAttribute('stroke', 'rgba(255,255,255,.1)');
+      svg.appendChild(line);
+    }
+    // 데이터
+    var dp = [];
+    for (var j = 0; j < n; j++){
+      var v = Math.max(stats[j], 6) / 100;
+      dp.push(point(j, R * v).join(','));
+    }
+    var defs = document.createElementNS(NS, 'defs');
+    defs.innerHTML = '<linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c5cff" stop-opacity=".72"/><stop offset="1" stop-color="#00e5c7" stop-opacity=".55"/></linearGradient>';
+    svg.appendChild(defs);
+    var shape = document.createElementNS(NS, 'polygon');
+    shape.setAttribute('points', dp.join(' '));
+    shape.setAttribute('fill', 'url(#rg)');
+    shape.setAttribute('stroke', '#00e5c7');
+    shape.setAttribute('stroke-width', '1.6');
+    shape.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(shape);
+    for (var k = 0; k < n; k++){
+      var v2 = Math.max(stats[k], 6) / 100;
+      var c = point(k, R * v2);
+      var dot = document.createElementNS(NS, 'circle');
+      dot.setAttribute('cx', c[0]); dot.setAttribute('cy', c[1]);
+      dot.setAttribute('r', '3.1');
+      dot.setAttribute('fill', STATS[k].color);
+      svg.appendChild(dot);
+    }
+  }
+
+  document.getElementById('copyRes').addEventListener('click', function(){
+    copyText(lastResultText, '복사 완료! 단톡방에 붙여넣으세요');
+  });
+
+  renderQuestion();
+})();
+</script>
+</body>
+</html>
