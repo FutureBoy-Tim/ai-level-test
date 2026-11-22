@@ -310,7 +310,7 @@
       <div class="bar"><i id="qBar"></i></div>
       <p class="q-text" id="qText">불러오는 중…</p>
       <div class="opts" id="qOpts"></div>
-      <div class="q-nav" id="qNav" style="visibility:hidden">
+      <div class="q-nav" id="qNav" style="display:none">
         <button class="ghost" id="qBack" type="button">← 이전 문항</button>
       </div>
     </div>
@@ -694,7 +694,7 @@
       b.addEventListener('click', function(){ choose(i); });
       qOpts.appendChild(b);
     });
-    qNav.style.visibility = step === 0 ? 'hidden' : 'visible';
+    qNav.style.display = step === 0 ? 'none' : 'flex';
   }
 
   function choose(i){
